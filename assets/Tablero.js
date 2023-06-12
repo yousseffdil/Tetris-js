@@ -19,7 +19,47 @@ class Tablero {
     }
     set almacenarMinos(tetrimino) {
         for (const pmino of tetrimino.mapaTablero) {
-            this.minosAlmacenados[pmino.columna][pmino.fila] = tetrimino.nombre;
+            if (pmino.y < 0) {
+                tablero = new Tablero;
+                tetrimino = new Tetrimino;
+
+            }
+            this.minosAlmacenados[pmino.x][pmino.y] = tetrimino.nombre;
+        }
+        this.buscarLineas();
+    }
+
+    buscarLineas(){
+        let lineas = [];
+        for (let fila = this.filas - 1; fila >= 0; fila--) {
+            let agregar = true;
+
+            for (let columna = 0; columna < this.columnas; columna++) {
+                if(!this.minosAlmacenados[columna][fila]){
+                    agregar = false;
+                    break;
+                }
+            }
+            if(agregar){
+                lineas.push(fila)
+            }
+        }
+        this.borrarLineas(lineas);
+
+    }
+
+
+    borrarLineas(lineas) {
+        for (const linea of lineas) {
+            for (let fila = linea; fila >= 0; fila--) {
+                for (let columna = 0; columna < this.columnas; columna++) {
+                    if(fila == 0){
+                        this.minosAlmacenados[columna][fila]= "";
+                        continue
+                    }
+                    this.minosAlmacenados[columna][fila] = this.minosAlmacenados[columna][fila-1]
+                }
+            }
         }
     }
 
@@ -50,10 +90,10 @@ class Tablero {
         push();
         for (let columna = 0; columna < this.columnas; columna++) {
             for (let fila = 0; fila < this.filas; fila++) {
-                fill("lightgrey");
-
-                if (this.minosAlmacenados[columna][fila]) {
-                    Tetrimino.dibujarMino(createVector(columna, fila));
+                let nombreMino = this.minosAlmacenados[columna][fila];
+                if (nombreMino) {
+                    fill(tetriminosBase[nombreMino].color);
+                    Tetrimino.dibujarMino(this.cordenada(columna, fila));
                 }
 
             }

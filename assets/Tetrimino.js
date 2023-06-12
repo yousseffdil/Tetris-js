@@ -99,10 +99,13 @@ class Tetrimino {
         this.posicion.y++;
         if (this.movimientoError) {
             this.moverArriba();
-            tablero.almacenarMinos = this
-            tetrimino = new Tetrimino;
-
+            if (tetrimino == this) {
+                tablero.almacenarMinos = this
+                tetrimino = new Tetrimino;
+            }
+            return false;
         }
+        return true;
     }
     moverArriba() {
         this.posicion.y--;
@@ -121,7 +124,15 @@ class Tetrimino {
     }
     get movimientoError() {
         let salio = !this.DentroTablero;
-        return salio;
+        return salio || this.colisionMino;
+    }
+    get colisionMino() {
+        for (const pmino of this.mapaTablero) {
+            if (tablero.minosAlmacenados[pmino.x][pmino.y]) {
+                return true;
+            }
+        }
+        return false
     }
 
     get DentroTablero() {
@@ -166,7 +177,26 @@ class Tetrimino {
             Tetrimino.dibujarMino(pmino);
         }
         pop();
+
+        if (tetrimino == this) {
+            this.dibujarEspectro();
+        }
     }
+
+    dibujarEspectro() {
+        this.espectro = new Tetrimino(this.nombre);
+        this.espectro.posicion = this.posicion.copy();
+        for (let i = 0; i < this.mapa.length; i++) {
+            this.espectro.mapa[i] = this.mapa[i].copy()
+
+        }
+        while (this.espectro.moverAbajo())
+            push()
+        drawingContext.globalAlpha = 0.5;
+        this.espectro.dibujar();
+        pop()
+    }
+
     static dibujarMino(pmino) {
 
         rect(pmino.x, pmino.y, tablero.lado_celda);
